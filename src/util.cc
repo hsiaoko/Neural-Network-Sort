@@ -1,4 +1,4 @@
-#include"../include/util.h"
+#include"util.h"
 
 vector<float> *Initialize(int size, int seed)
 {
