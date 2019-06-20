@@ -7,7 +7,7 @@ void ToBucket(Eigen::MatrixXf input, InitResut *initResult)
         int pos = int(round(input(i, 1)));
         if ((*initResult->sortedList)[pos] == FLT_MAX)
         {
-            (*initResult->sortedList)[pos] = input(i, 0);
+            (*initResult->sortedList)[pos*2] = input(i, 0);
         }
         else
         {

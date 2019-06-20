@@ -7,9 +7,10 @@
 #include"map.h"
 using namespace std;
 using namespace Eigen;
+
 int main()
 {
-	int size = 2621440;
+	int size = 60000000;
 	//2621440
 	MatrixXf keys_logits(size, 2);
 	vector<float> *data = Initialize(size, 2);
@@ -25,7 +26,7 @@ int main()
 
 	auto max = keys_logits.colwise().maxCoeff();
 	InitResut initResult;
-	initResult.sortedList = new vector<float>(int(round(max[1])), FLT_MAX);
+	initResult.sortedList = new vector<float>(int(round(max[1])*3), FLT_MAX);
 	initResult.waitedList = new vector<float>();
 
 	steady_clock::time_point sortBucketStart = steady_clock::now();
@@ -49,5 +50,7 @@ int main()
 	cout << "consumming of bucket:" << timeSpanBucket->count() << " ms" << endl;
 	cout << "consumming of merge:" << timeSpanMerg->count() << " ms" << endl;
 	cout << "consumming of sort:" << timeSpan1->count() << " ms" << endl;
+
+    check(finalResult);
 	//	graph_();
 }

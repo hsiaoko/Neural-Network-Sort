@@ -12,3 +12,23 @@ vector<float> *Initialize(int size, int seed)
     }
     return data;
 }
+void check(vector<float> *finalResul){
+    //float minimum_ = FLT_MIN;
+    float minimum_ = -1;
+    int count=0;
+    vector<float>::iterator iter = finalResul->begin();
+    for (; iter!=finalResul->end(); iter++){
+        if (*iter > minimum_){
+            minimum_ = *iter;
+            ++count;
+        }else{
+            break;
+        }
+    }
+    if (iter == finalResul->end()){
+        cout<<"order"<<endl;
+    }else{
+        cout<<"disorder "<<"because of "<<count<<" th-element"<<endl;
+    }
+
+}
