@@ -1,1 +1,0 @@
-/usr/bin/c++    -rdynamic CMakeFiles/nnsort.dir/src/graph.cc.o CMakeFiles/nnsort.dir/src/main.cc.o CMakeFiles/nnsort.dir/src/map.cc.o CMakeFiles/nnsort.dir/src/quick.cc.o CMakeFiles/nnsort.dir/src/util.cc.o  -o nnsort -lm 

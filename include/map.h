@@ -16,7 +16,7 @@ struct InitResut
     vector<double> *waitedList;
 };
 //初步排序
-void ToBucket(Eigen::MatrixXd,InitResut*);
+void ToBucket(Eigen::MatrixXd*,InitResut*);
 //合并
 void Merge(InitResut*,vector<double>*);
 

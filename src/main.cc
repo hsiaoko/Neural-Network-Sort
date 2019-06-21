@@ -12,7 +12,7 @@ int main()
 {
     //initialize
 	int size = 60000000;
-	//2621440
+	//60000000
 	MatrixXd keys_logits(size, 2);
 	vector<float> *data = Initialize(size, 2);
 	cout << "data_size:" << data->size() << endl;
@@ -41,7 +41,7 @@ int main()
 	initResult.waitedList = new vector<double>();
     cout<<"To bucket start:\n"<<endl;
 	steady_clock::time_point sortBucketStart = steady_clock::now();
-	ToBucket(keys_logits, &initResult);
+	ToBucket(&keys_logits, &initResult);
 	steady_clock::time_point sortBucketEnd = steady_clock::now();
     cout<<"To bucket end\n"<<endl;
 
