@@ -20,27 +20,34 @@ MatrixXf max_out_(MatrixXf input, int neuron_number)
 {
 
 }
-MatrixXf *graph_(MatrixXf *x_in, int data_size, MatrixXf *keys_logits)
+MatrixXd *graph_(MatrixXd *x_in, int data_size, MatrixXd *keys_logits)
 {
 
-	steady_clock::time_point predictStart = steady_clock::now();
 
-	MatrixXf dense_1_kernel_0(1, 4);
-	dense_1_kernel_0 <<39.29980451, -38.82846923, -38.37837488, 39.35526869;
+	MatrixXd dense_1_kernel_0(1, 4);
+	VectorXd dense_1_bias_0(4);
+	MatrixXd dense_2_kernel_0(4, 1);
+    VectorXd logits_bias(1);
 
 
-	MatrixXf output_1 = (*x_in) * dense_1_kernel_0;
-	MatrixXf dense_2_kernel_0(4, 1);
 
-    dense_2_kernel_0<<37.80961724, -39.0512867, -39.18649525, 37.9512024;
-	MatrixXf logits = output_1 * dense_2_kernel_0;
+	dense_1_kernel_0 <<39.29980451, -38.82846923, -38.37837488,39.35526869;
+	dense_1_bias_0 << 26.85578852, -26.42188599, -26.51935639, 27.0847777;
+    dense_2_kernel_0 << 37.80961724, -39.0512867, -39.18649525, 37.9512024;
+    logits_bias<< 23.55981952;
+    
+	MatrixXd output_1 = (*x_in) * dense_1_kernel_0;
+
+    output_1.rowwise() += dense_1_bias_0.transpose();
+
+
+
+	MatrixXd logits = output_1 * dense_2_kernel_0;
+    logits.rowwise() += logits_bias.transpose();
 
 	(*keys_logits) << (*x_in), logits;
 
-	steady_clock::time_point predictEnd = steady_clock::now();
-	duration<double, std::milli> *timePredicte = new duration<double, std::milli>(predictEnd -predictStart);
 
-	cout << "consumming of predict:" << timePredicte->count() << " ms" << endl;
 	return 0;
 }
 

@@ -12,12 +12,12 @@ using namespace Eigen;
 struct InitResut
 {
     /* data */
-    vector<float> *sortedList;
-    vector<float> *waitedList;
+    vector<double> *sortedList;
+    vector<double> *waitedList;
 };
 //初步排序
-void ToBucket(Eigen::MatrixXf,InitResut*);
+void ToBucket(Eigen::MatrixXd,InitResut*);
 //合并
-void Merge(InitResut*,vector<float>*);
+void Merge(InitResut*,vector<double>*);
 
 #endif

@@ -12,13 +12,14 @@ vector<float> *Initialize(int size, int seed)
     }
     return data;
 }
-void check(vector<float> *finalResul){
+void check(vector<double> *finalResul){
     //float minimum_ = FLT_MIN;
     float minimum_ = -1;
     int count=0;
-    vector<float>::iterator iter = finalResul->begin();
+    vector<double>::iterator iter = finalResul->begin();
     for (; iter!=finalResul->end(); iter++){
-        if (*iter > minimum_){
+     //   cout<<*iter<<endl;
+        if (*iter >= minimum_){
             minimum_ = *iter;
             ++count;
         }else{

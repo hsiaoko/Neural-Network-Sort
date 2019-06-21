@@ -10,6 +10,6 @@ using namespace Eigen;
 
 MatrixXf relu_(MatrixXf );
 MatrixXf max_out_(MatrixXf , int );
-MatrixXf *graph_(MatrixXf *, int , MatrixXf *);
+MatrixXd *graph_(MatrixXd *, int , MatrixXd *);
 
 #endif

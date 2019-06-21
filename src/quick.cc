@@ -1,6 +1,6 @@
 #include"../include/quick.h"
 
-int Partion(vector<float> *V, int low, int high)
+int Partion(vector<double> *V, int low, int high)
 {
     float piv = (*V)[low];
     while (low < high)
@@ -19,8 +19,9 @@ int Partion(vector<float> *V, int low, int high)
     (*V)[low]=piv;
     return low;
 }
-void QuickSort(vector<float> *V, int low, int high)
+void QuickSort(vector<double> *V, int low, int high)
 {
+    
     if (low < high)
     {
         int pivloc = Partion(V, low, high);

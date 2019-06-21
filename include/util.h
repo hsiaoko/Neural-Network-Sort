@@ -15,5 +15,5 @@ using std::chrono::steady_clock;
 using std::chrono::duration;
 
 vector<float> *Initialize(int, int);
-void check(vector<float> *);
+void check(vector<double> *);
 #endif

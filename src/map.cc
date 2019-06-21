@@ -1,13 +1,13 @@
 #include "map.h"
 
-void ToBucket(Eigen::MatrixXf input, InitResut *initResult)
+void ToBucket(Eigen::MatrixXd input, InitResut *initResult)
 {
     for (int i = 0; i < input.rows(); i++)
     {
-        int pos = int(round(input(i, 1)));
+        int pos = int(round(input(i, 1))*2);
         if ((*initResult->sortedList)[pos] == FLT_MAX)
         {
-            (*initResult->sortedList)[pos*2] = input(i, 0);
+            (*initResult->sortedList)[pos] = input(i, 0);
         }
         else
         {
@@ -25,9 +25,10 @@ void ToBucket(Eigen::MatrixXf input, InitResut *initResult)
     //     cout << (*initResult->waitedList)[j] << endl;
     // }
     cout << "size of waited:" << initResult->waitedList->size() << endl;
-    cout << "size of sorted:" << initResult->sortedList->size() << endl;
+    cout << "size of order elements:" << input.rows() - initResult->waitedList->size() << endl;
+    cout << "size of array:" << initResult->sortedList->size() << endl;
 }
-void Merge(InitResut *initResult, vector<float> *finalResult)
+void Merge(InitResut *initResult, vector<double> *finalResult)
 {
     int indexa = 0;
     int indexb = 0;
