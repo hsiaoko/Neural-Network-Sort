@@ -17,13 +17,17 @@ struct InitResut
 };
 struct InitResultGpu
 {
+    int sizeSorted;
+    int sizeWaited;
     float*sortedList;
     float*waitedList;
 }
+
 //初步排序
 void ToBucket(Eigen::MatrixXd*,InitResut*);
 void ToBucket(float**,int,InitResultGpu*);
 //合并
 void Merge(InitResut*,vector<double>*);
+void Merge(InitResultGpu*)
 
 #endif

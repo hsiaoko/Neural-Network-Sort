@@ -29,8 +29,12 @@ void ToBucket(Eigen::MatrixXd *input, InitResut *initResult)
     cout << "size of array:" << initResult->sortedList->size() << endl;
 }
 
-void ToBucket(float**input, InitResultGpu *initResultGpu)
+void ToBucket(float**input,int dataRows,InitResultGpu *initResultGpu)
 {
+    for(int i=0;i<dataRows;i++)
+    {
+        
+    }
     // for (int i = 0; i < input->rows(); i++)
     // {
     //     int pos = int(round((*input)(i, 1))*2);

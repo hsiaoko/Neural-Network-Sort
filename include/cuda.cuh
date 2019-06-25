@@ -1,3 +1,5 @@
+#ifndef CUDA_H
+#define CUDA_H
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include <iostream>
@@ -25,3 +27,4 @@ __global__ void dense_1_4(float *, float *,float*, float *);
 __global__ void dense_4_1(float *,float*,float*,float*);
 __device__ float relu_(float );
 void model();
+#endif
