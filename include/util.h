@@ -5,6 +5,7 @@
 #include <random>
 #include<algorithm>
 #include<chrono>
+#include<float.h>
 using std::cout;
 using std::default_random_engine;
 using std::uniform_real_distribution;
@@ -22,5 +23,6 @@ struct KeysLogits{
     int sizeLogits;
     float *keys;
     float * logits;
-}
+};
+int max_(KeysLogits * );
 #endif
