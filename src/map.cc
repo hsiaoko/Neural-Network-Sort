@@ -93,33 +93,21 @@ void Merge(InitResut *initResult, vector<double> *finalResult)
 }
 void Merge(InitResultGpu * initResult, float * finalResult){
 
-    int ida = 0;
-    int idb = 0;
-    int idc = 0;
+    int indexa = 0;
+    int indexa = 0;
+    int indexc = 0
+    while(initResult->sizeSorted > indexa && initResult->waitedList->sizeWaited > indexb){
+        if (initResult->sortedList[indexa]!=FLT_MAX){
+            if(initResult->sortedList[indexa]<= initResult->waitedList[indexb]){
+                finalResult[indexc++] = initResult->sortedList[indexa];
+                ++indexa;
+            }else{
+                finalResult[indexc++] = initResult->sortedList[indexa];
+                ++indexb;
 
-    while(ida < initResult->sizeSorted && idb < initResult->sizeWaited){
-        if ( *(initResult->sortedList + ida) < *(initResult->waitedList + idb)){
-            *(finalResult + idc) = *(initResult->sortedList + ida);
-            ++ida;
-            ++idc;
+            }
         }else{
-            *(finalResult + idc) = *(initResult->waitedList + idb);
-            ++idb;
-            ++idc;
-        }
-    }
-    if (ida == initResult->sizeSorted){
-        while(idb <initResult->sizeWaited){
-            *(finalResult + idc) = *(initResult->waitedList + idb);
-            ++idb;
-            ++idc;
-        }
-    }
-    if (idb == initResult->waitedList){
-        while(ida <initResult->sizeSorted){
-            *(finalResult + idc) = *(initResult->sortedList + ida);
-            ++ida;
-            ++idc;
+            ++indexa;
         }
     }
 }
