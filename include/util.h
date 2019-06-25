@@ -17,4 +17,10 @@ using std::chrono::duration;
 //vector<float> *Initialize(int, int);
 float *Initialize(int, int);
 void check(vector<double> *);
+struct keys_logits{
+    int sizeKeys;
+    int sizeLogits;
+    float *keys;
+    float * logits;
+}
 #endif
