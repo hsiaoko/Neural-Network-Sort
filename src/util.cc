@@ -1,6 +1,6 @@
 #include"util.h"
 
-vector<float> *Initialize(int size, int seed)
+/*vector<float> *Initialize(int size, int seed)
 {
     default_random_engine e;
     uniform_real_distribution<float> distribution(0.0,10000.0);
@@ -9,6 +9,20 @@ vector<float> *Initialize(int size, int seed)
     for (vector<float>::iterator iter = data->begin(); iter != data->end(); iter++)
     {
         *iter = distribution(e);
+    }
+    return data;
+}
+*/
+float *Initialize(int size, int seed)
+{
+    default_random_engine e;
+    uniform_real_distribution<float> distribution(0.0,10000.0);
+    e.seed(seed);
+    float *data = (float*)malloc(sizeof(float) * size);
+
+    for (int i = 0; i < size; ++i){
+        *(data + i) = distribution(e);
+
     }
     return data;
 }

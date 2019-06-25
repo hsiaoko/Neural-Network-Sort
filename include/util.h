@@ -14,6 +14,7 @@ using std::sort;
 using std::chrono::steady_clock;
 using std::chrono::duration;
 
-vector<float> *Initialize(int, int);
+//vector<float> *Initialize(int, int);
+float *Initialize(int, int);
 void check(vector<double> *);
 #endif
