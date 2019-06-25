@@ -85,3 +85,23 @@ void Merge(InitResut *initResult, vector<double> *finalResult)
     finalResult->insert(finalResult->end(), initResult->waitedList->begin() + indexb, initResult->waitedList->end());
     cout << "final:" << finalResult->size() << endl;
 }
+void Merge(InitResultGpu * initResult, float * finalResult){
+
+    int indexa = 0;
+    int indexa = 0;
+    int indexc = 0
+    while(initResult->sizeSorted > indexa && initResult->waitedList->sizeWaited > indexb){
+        if (initResult->sortedList[indexa]!=FLT_MAX){
+            if(initResult->sortedList[indexa]<= initResult->waitedList[indexb]){
+                finalResult[indexc++] = initResult->sortedList[indexa];
+                ++indexa;
+            }else{
+                finalResult[indexc++] = initResult->sortedList[indexa];
+                ++indexb;
+
+            }
+        }else{
+            ++indexa;
+        }
+    }
+}

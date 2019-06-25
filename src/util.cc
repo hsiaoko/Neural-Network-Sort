@@ -47,3 +47,13 @@ void check(vector<double> *finalResul){
     }
 
 }
+int max_(struct KeyLogits * keys_logits){
+    int max_ = INT_MIN;
+    for (int i = 0; i < keys_logits->sizeKeys; ++i)
+        if *(keys_logits->logits + i) > max_){
+            continue;
+        }else{
+            max_ = *(keys_logits->logits + i);
+        }
+    return max_;
+}
