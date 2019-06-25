@@ -29,37 +29,31 @@ void ToBucket(Eigen::MatrixXd *input, InitResut *initResult)
     cout << "size of array:" << initResult->sortedList->size() << endl;
 }
 
-void ToBucket(float**input,int dataRows,InitResultGpu *initResultGpu)
+void ToBucket(keys_logits*input,InitResultGpu *initResultGpu)
 {
-    for(int i=0;i<dataRows;i++)
+    int currentSize=0;
+    for(int i=0;i<input->sizeKeys;i++)
     {
-        
+        int pos = int(round(*(input->logits+i)));
+        if (*(initResultGpu->sortedList+pos) == FLT_MAX)
+        {
+            *(initResultGpu->sortedList+pos) = *(input->keys+i);
+        }
+        else
+        {
+            if(currentSize==0)
+            {
+                initResultGpu->waitedList=(float*)malloc(sizeof(float));
+            }
+            else
+            {
+                initResultGpu->waitedList=(float*)realloc(initResultGpu->waitedList,sizeof(float));
+            }
+            *(initResultGpu->waitedList+currentSize)=*(input->keys+i);
+            currentSize++;
+        }
     }
-    // for (int i = 0; i < input->rows(); i++)
-    // {
-    //     int pos = int(round((*input)(i, 1))*2);
-    //     if ((*initResult->sortedList)[pos] == FLT_MAX)
-    //     {
-    //         (*initResult->sortedList)[pos] = (*input)(i, 0);
-    //     }
-    //     else
-    //     {
-    //         initResult->waitedList->push_back((*input)(i, 0));
-    //     }
-    // }
-    // cout<<"-------------------------sorted--------------------\n";
-    // for (int i = 0; i < initResult->sortedList->size(); i++)
-    // {
-    //     cout << (*initResult->sortedList)[i] << endl;
-    // }
-    // cout<<"-------------------------waited--------------------\n";
-    // for (int j = 0; j < initResult->waitedList->size(); j++)
-    // {
-    //     cout << (*initResult->waitedList)[j] << endl;
-    // }
-    // cout << "size of waited:" << initResult->waitedList->size() << endl;
-    // cout << "size of order elements:" << input->rows() - initResult->waitedList->size() << endl;
-    // cout << "size of array:" << initResult->sortedList->size() << endl;
+    initResultGpu->sizeWaited=currentSize;
 }
 
 void Merge(InitResut *initResult, vector<double> *finalResult)

@@ -5,6 +5,7 @@
 #include<Eigen/Dense>
 #include<math.h>
 #include<float.h>
+#include"util.h"
 using std::vector;
 using std::cout;
 using std::endl;
@@ -25,7 +26,7 @@ struct InitResultGpu
 
 //初步排序
 void ToBucket(Eigen::MatrixXd*,InitResut*);
-void ToBucket(float**,int,InitResultGpu*);
+void ToBucket(keys_logits*,InitResultGpu*);
 //合并
 void Merge(InitResut*,vector<double>*);
 void Merge(InitResultGpu*)
