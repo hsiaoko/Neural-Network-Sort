@@ -28,6 +28,6 @@ void ToBucket(Eigen::MatrixXd*,InitResut*);
 void ToBucket(float**,int,InitResultGpu*);
 //合并
 void Merge(InitResut*,vector<double>*);
-void Merge(InitResultGpu*)
+void Merge(InitResultGpu*, float *)
 
 #endif
