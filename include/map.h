@@ -1,15 +1,9 @@
 #ifndef MAP_H
 #define MAP_H
-#include<iostream>
 #include<vector>
-#include<Eigen/Dense>
 #include<math.h>
 #include<float.h>
 #include"util.h"
-using std::vector;
-using std::cout;
-using std::endl;
-using namespace Eigen;
 struct InitResut
 {
     /* data */
@@ -25,7 +19,6 @@ struct InitResultGpu
 };
 
 //初步排序
-void ToBucket(Eigen::MatrixXd*,InitResut*);
 void ToBucket(KeysLogits*,InitResultGpu*);
 //合并
 void Merge(InitResut*,vector<double>*);
