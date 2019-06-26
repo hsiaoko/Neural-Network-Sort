@@ -88,20 +88,24 @@ void Merge(InitResut *initResult, vector<double> *finalResult)
 void Merge(InitResultGpu * initResult, float * finalResult){
 
     int indexa = 0;
-    int indexa = 0;
-    int indexc = 0
-    while(initResult->sizeSorted > indexa && initResult->waitedList->sizeWaited > indexb){
-        if (initResult->sortedList[indexa]!=FLT_MAX){
-            if(initResult->sortedList[indexa]<= initResult->waitedList[indexb]){
-                finalResult[indexc++] = initResult->sortedList[indexa];
-                ++indexa;
+    int indexb = 0;
+    int indexc = 0;
+    while(initResult->sizeSorted > indexa && initResult->sizeWaited > indexb){
+        if (*(initResult->sortedList+indexa)!=FLT_MAX){
+            
+            if(*(initResult->sortedList+indexa)<= *(initResult->waitedList+indexb)){
+                *(finalResult+indexc++) = *(initResult->sortedList+indexa++);
             }else{
-                finalResult[indexc++] = initResult->sortedList[indexa];
-                ++indexb;
-
+                *(finalResult+indexc++) = *(initResult->waitedList+indexb++);
             }
         }else{
             ++indexa;
         }
+        cout<<"indexa:"<<indexa<<" indexb:"<<indexb<<" indexc:"<<indexc<<endl;
     }
+    for(int i=indexa;i<initResult->sizeSorted;i++)
+         *(finalResult+indexc++) = *(initResult->sortedList+i);
+
+    for(int i=indexb;i<initResult->sizeWaited;i++)
+         *(finalResult+indexc++) = *(initResult->waitedList+i);
 }
