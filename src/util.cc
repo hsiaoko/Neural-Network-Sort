@@ -1,6 +1,6 @@
 #include"util.h"
 
-/*vector<float> *Initialize(int size, int seed)
+vector<float> *InitializeVec(int size, int seed)
 {
     default_random_engine e;
     uniform_real_distribution<float> distribution(0.0,10000.0);
@@ -12,7 +12,7 @@
     }
     return data;
 }
-*/
+
 float *Initialize(int size, int seed)
 {
     default_random_engine e;

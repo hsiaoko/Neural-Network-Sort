@@ -15,7 +15,7 @@ void CpuModel()
 	int size = 60000000;
 	//60000000
 	MatrixXd keys_logits(size, 2);
-	vector<float> *data = Initialize(size, 2);
+	vector<float> *data = InitializeVec(size, 2);
 	cout << "data_size:" << data->size() << endl;
 	MatrixXd x_in = ArrayXXd::Zero(data->size(), 1);
 
@@ -84,7 +84,20 @@ void CpuModel()
 }
 
 int main(){
-    model();
+    
+    float *key=Initialize(data_size,2);
+    KeysLogits *output=(KeysLogits*)malloc(sizeof(KeysLogits));
+    output->sizeKeys=data_size;
+    output->sizeLogits=data_size;
+    output->logits=(float*)malloc(sizeof(float)*output->sizeLogits);
+    model(key,output);
+    
+    cout<<"*********************output**********************"<<endl;
+    for(int i=0;i<output->sizeKeys;i++)
+    {
+        cout<<*(output->keys+i)<<' '<<*(output->logits+i)<<endl;                                                                                                    
+    }
+
 
 }
 

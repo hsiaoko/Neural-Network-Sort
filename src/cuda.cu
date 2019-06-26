@@ -1,8 +1,7 @@
 #include"cuda.cuh"
 #include"util.h"
-void model()
+void model(float *input,KeysLogits*keylogists)
 {
-    float *A = Initialize(data_size,2);
     float *B = (float *)malloc(sizeof(float) * dense1);
     float *W2=(float *)malloc(sizeof(float) * dense2);
     float *C = (float *)malloc(sizeof(float) * data_size * 4);
@@ -36,7 +35,7 @@ void model()
     cudaMalloc((void **)&bias1_d, sizeof(float) * dense1);
     cudaMalloc((void **)&bias2_d, sizeof(float) * 1);
 
-    cudaMemcpy( A_d, A, sizeof(float) * data_size, cudaMemcpyHostToDevice);
+    cudaMemcpy( A_d, input, sizeof(float) * data_size, cudaMemcpyHostToDevice);
     cudaMemcpy( B_d, B, sizeof(float) * dense1, cudaMemcpyHostToDevice);
     cudaMemcpy( W2_d, W2, sizeof(float) * dense2, cudaMemcpyHostToDevice);
     cudaMemcpy( bias1_d, bias1, sizeof(float) * dense1, cudaMemcpyHostToDevice);
@@ -55,52 +54,51 @@ void model()
 
 
     dense_1_4 <<<grindSize, blockSize>>> (A_d, B_d,bias1_d, C_d);
-    // float *temp = (float *)malloc(sizeof(float) * data_size * 4);
-    // cudaMemcpy( temp, C_d, sizeof(float) * data_size * 4, cudaMemcpyDeviceToHost);
-    // cout<<"********************vector A********************";
-    // cout<<endl;
-    // for(int i=0;i<data_size;i++)
-    // {
-    //     cout<<A[i]<<"    ";
-    // }
-    // cout<<endl;
-    // cout<<"********************matrixc C********************";
-    // cout<<endl;
-    // for(int i=0;i<data_size*4;i++)
-    // {
-    //  cout<<*(temp+i)<<"    ";
-    //  if((i+1)%4==0)
-    //     cout<<endl;
-    // }
-    // cout<<endl;
+     float *temp = (float *)malloc(sizeof(float) * data_size * 4);
+     cudaMemcpy( temp, C_d, sizeof(float) * data_size * 4, cudaMemcpyDeviceToHost);
+     cout<<"********************vector A********************";
+     cout<<endl;
+     for(int i=0;i<data_size;i++)
+     {
+         cout<<input[i]<<"    ";
+     }
+     cout<<endl;
+     cout<<"********************matrixc C********************";
+     cout<<endl;
+     for(int i=0;i<data_size*4;i++)
+     {
+      cout<<*(temp+i)<<"    ";
+      if((i+1)%4==0)
+         cout<<endl;
+     }
+     cout<<endl;
     dense_4_1<<<grindSize, blockSize>>>(C_d,W2_d,bias2_d,A_d);
     steady_clock::time_point t2=steady_clock::now();
-    cudaMemcpy( A, A_d, sizeof(float) * data_size, cudaMemcpyDeviceToHost);
+    cudaMemcpy( keylogists->logits, A_d, sizeof(float) * data_size, cudaMemcpyDeviceToHost);
 
 
 
-    // cout<<"********************vector B********************";
-    // cout<<endl;
-    // for(int i=0;i<dense1;i++)
-    // {
-    //  cout<<*(B+i)<<' ';
-    // }
-    // cout<<endl;
-    // cout<<"********************vector logist********************";
-    // cout<<endl;
-    // for(int i=0;i<data_size;i++)
-    // {
-    //  cout<<*(A+i)<<"    ";
-    // }
-    // cout<<endl;
+    cout<<"********************vector B********************";
+    cout<<endl;
+    for(int i=0;i<dense1;i++)
+    {
+     cout<<*(B+i)<<' ';
+    }
+    cout<<endl;
+    cout<<"********************vector logist********************";
+    cout<<endl;
+    for(int i=0;i<data_size;i++)
+    {
+     cout<<*(keylogists->logits+i)<<"    ";
+    }
+    cout<<endl;
 
     free(B);
-    free(A);
     free(C);
     free(W2);
     free(bias1);
     free(bias2);
-    // free(temp);
+    free(temp);
     cudaFree(A_d);
     cudaFree(B_d);
     cudaFree(C_d);

@@ -23,8 +23,12 @@ using std::endl;
 
 void CudaProp();
 __device__ int getGlobalIdx_2D_1D();
+__global__ void dense_1_8(float *, float *,float*, float *);
+__global__ void dense_8_4(float *, float *,float*, float *);
+
 __global__ void dense_1_4(float *, float *,float*, float *);
+
 __global__ void dense_4_1(float *,float*,float*,float*);
 __device__ float relu_(float );
-void model();
+void model(float*,KeysLogits*);
 #endif
