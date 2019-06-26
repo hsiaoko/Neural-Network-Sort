@@ -29,7 +29,7 @@ void ToBucket(Eigen::MatrixXd *input, InitResut *initResult)
     cout << "size of array:" << initResult->sortedList->size() << endl;
 }
 
-void ToBucket(keys_logits*input,InitResultGpu *initResultGpu)
+void ToBucket(KeysLogits*input,InitResultGpu *initResultGpu)
 {
     int currentSize=0;
     for(int i=0;i<input->sizeKeys;i++)
