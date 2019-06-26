@@ -12,6 +12,6 @@ struct Params{
     int n;//datasize
     float * dense_1_8;
     float * dense_8_4;
-    flaot * dense_4_1;
+    float * dense_4_1;
 };
 #endif
