@@ -25,4 +25,5 @@ struct KeysLogits{
     float * logits;
 };
 int max_(KeysLogits * );
+void initializeMatrix(float * );
 #endif

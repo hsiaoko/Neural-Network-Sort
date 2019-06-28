@@ -26,6 +26,16 @@ float *Initialize(int size, int seed)
     }
     return data;
 }
+void initializeMatrix(float * matrix){
+
+    for (int i =0 ; i<4;++i){
+        for (int j = 0; j<8; ++j){
+            *(matrix+i*8+j) = i;
+        }
+    }
+
+    return;
+}
 void check(vector<double> *finalResul){
     //float minimum_ = FLT_MIN;
     float minimum_ = -1;

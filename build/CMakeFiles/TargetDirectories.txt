@@ -1,3 +1,0 @@
-/home/special/user/local/zxk/nns/cuda/Neural-Network-Sort/build/CMakeFiles/rebuild_cache.dir
-/home/special/user/local/zxk/nns/cuda/Neural-Network-Sort/build/CMakeFiles/edit_cache.dir
-/home/special/user/local/zxk/nns/cuda/Neural-Network-Sort/build/CMakeFiles/nnsort.dir
