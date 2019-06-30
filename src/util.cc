@@ -67,3 +67,6 @@ int max_(KeysLogits * keys_logits){
         }
     return max_;
 }
+void hello(){
+    cout<<"hello world"<<endl;
+}

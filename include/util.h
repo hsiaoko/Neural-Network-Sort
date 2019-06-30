@@ -1,5 +1,5 @@
-#ifndef TOOL_H
-#define TOOL_H
+#ifndef UTIL_H
+#define UTIL_H
 #include <iostream>
 #include <vector>
 #include <random>
@@ -26,4 +26,5 @@ struct KeysLogits{
 };
 int max_(KeysLogits * );
 void initializeMatrix(float * );
+void hello();
 #endif

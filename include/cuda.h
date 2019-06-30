@@ -28,5 +28,6 @@ __global__ void Dense2D2D( float * , float *,Dimension*,float* );
 __global__ void Dense_1_8(float*,float*,float*,Dimension*,float*);
 __global__ void Dense_4_1(float*,float*,float*,Dimension*,float*);
 __global__ void max_2D_1D (int , float * , float * );
-int max_1D(float * , int );
+float max_1D(float * , int );
+float model(KeysLogits*,int,float*);
 #endif

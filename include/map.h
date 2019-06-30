@@ -1,7 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 #include<vector>
-#include<math.h>
+#include<cmath>
 #include<float.h>
 #include"util.h"
 struct InitResut
