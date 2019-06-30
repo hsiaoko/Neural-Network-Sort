@@ -260,7 +260,6 @@ float model(KeysLogits*keysLogits,int dataSize,float*rawData){
     cudaMemcpy(params2D,params2,sizeof(float)*dim2->d2*dim2->d3,cudaMemcpyHostToDevice);
     float*output2=(float*)malloc(sizeof(float)*dim2->d1*dim2->d3);
     float*output2D;
-
     cudaMalloc((void **)&output2D, sizeof(float) * dim2->d1*dim2->d3);
     cout<<"***********************param2***********************"<<endl;
     for(int i=0;i<dim2->d2*dim2->d3;i++)
