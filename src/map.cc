@@ -3,8 +3,6 @@
 using namespace std;
 void ToBucket(KeysLogits *input, InitResultGpu *initResultGpu)
 {
-
-
     int currentSize = 0;
     for (int i = 0; i < input->sizeKeys; i++)
     {

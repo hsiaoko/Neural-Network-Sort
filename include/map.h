@@ -21,11 +21,8 @@ struct InitResultGpu
     double*waitedList;
 };
 
-//初步排序
 void ToBucket(KeysLogits*,InitResultGpu*);
 void Certify(double *, int);
-//合并
-//void Merge(InitResut*,vector<double>*);
 void Merge(InitResultGpu*, double *);
 
 #endif

@@ -94,12 +94,10 @@ double MAX_1D(double *inputD, int dataSize){
     MAX<<<blocksPerGrid, threadPerBlock>>>(inputD, maxOutput_d, threadPerBlock, dataSize);
 
     cudaMemcpy(maxOutput, maxOutput_d, sizeof(double)*blocksPerGrid, cudaMemcpyDeviceToHost);
- //   cout<<"MAX:"<<*(maxOutput)<<endl;
     int maxValue = 0;
     for (int i = 0 ; i < blocksPerGrid; ++i){
         maxValue = max(*(maxOutput+i),maxValue);
     }
-   // cout<<"MAX in MAX_1D:"<<maxValue<<endl;
     return maxValue;
 }
 
@@ -193,12 +191,12 @@ double model(KeysLogits*keysLogits,int dataSize,double*rawData){
     cout <<endl<< "consumming of nonMax:" << timeNonMax->count() << " ms" << endl;
 
     keysLogits->logits=final;
-    // free(input);
+    free(input);
     free(output);
     free(dim);
     free(dim2);
     free(output2);
-    // free(final);
+    free(final);
     cudaFree(inputD);
     cudaFree(paramsD);
     cudaFree(biasD);

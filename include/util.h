@@ -27,7 +27,6 @@ struct KeysLogits{
     double *keys;
     double * logits;
 };
-int max_(KeysLogits * );
 void initializeMatrix(double * );
 void initializeWeightsAndBias(double * , double * , double * , double * , double * , double *);
 void hello();

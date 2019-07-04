@@ -32,8 +32,6 @@ int main()
     double max_ = 0;
     steady_clock::time_point time3 = steady_clock::now();
     
-
-    
     QuickSort(initResultGpu->waitedList, 0, initResultGpu->sizeWaited-1);
     steady_clock::time_point time4 = steady_clock::now();
     

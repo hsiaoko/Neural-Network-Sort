@@ -58,16 +58,6 @@ void check(vector<double> *finalResul){
     }
 
 }
-int max_(KeysLogits * keys_logits){
-    double max_ = numeric_limits<double>::max();
-    for (int i = 0; i < keys_logits->sizeKeys; ++i)
-        if (*(keys_logits->logits + i) > max_){
-            continue;
-        }else{
-            max_ = *(keys_logits->logits + i);
-        }
-    return max_;
-}
 void initializeWeightsAndBias(double * weights_1_8, double * bias_1_8, double * weights_8_4, double * bias_8_4, double * weights_4_1, double *bias_4_1){
 
 	FILE * pFile;

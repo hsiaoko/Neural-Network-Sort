@@ -24,13 +24,8 @@ struct Dimension{
 };
 __device__ int GetThreadX();
 __device__ int GetThreadY();
-__global__ void Dense_1_8(double*,double*,double*,Dimension*,double*);
-__global__ void dense_8_4(double *, double *, double *, Dimension *, double *);
 __global__ void Dense_2D_2D(double *, double *, double *, Dimension *, double *);
-__global__ void Dense_4_1(double*,double*,double*,Dimension*,double*);
-__global__ void max_2D_1D (int , double * , double * );
 __global__ void MAX(double * , double *, int, int );
-double max_1D(double * , int );
 double MAX_1D(double *inputD, int dataSize);
 double model(KeysLogits*,int,double*);
 #endif
