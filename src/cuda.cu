@@ -1,5 +1,10 @@
 #include"cuda.h"
 #include"util.h"
+#include<iomanip>
+#include<iostream>
+using namespace std;
+#define max(a, b) (a > b ? a : b)
+#define relu(a) (a > 0 ? a : 0)
 void CudaProp()
 {
     int device_count;
@@ -22,14 +27,6 @@ void CudaProp()
         cout<<"=================================================================="<<endl;
     }
 }
-
-__device__ float Relu(float p){
-    if (p > 0){
-        return p;
-    }else{
-        return 0;
-    }
-}
 __device__ int GetThreadX(){
     return blockIdx.x*blockDim.x+threadIdx.x;
 }
@@ -37,278 +34,168 @@ __device__ int GetThreadY()
 {
     return blockIdx.y*blockDim.y+threadIdx.y;
 }
-__global__ void Dense2D2D( float * input_d, float *matrix_d,Dimension*dim,float* output_d){
-    //[m*n][m*k]
-    int thread_cover=dim->d1/(gridDim.x*gridDim.y*blockDim.x);
 
-    int blockId = gridDim.x * blockIdx.y+ blockIdx.x;
-    int threadId = blockId * blockDim.x+ threadIdx.x;
-    int start_point = threadId*thread_cover;
-    int end_point = (threadId+1)*thread_cover;
-    // (debugOutput+threadId)->start_point = start_point;
-    // (debugOutput+threadId)->end_point = end_point;
-    // (debugOutput+threadId)->threadId_x = threadId;
-
-
-    // *(output_d)=*(matrix_d+10);
-    for (int i = start_point; i< end_point; ++i){
-        for (int j = 0; j < dim->d3; ++j){
-            for (int k = 0; k < dim->d2; ++k){
-                *(output_d+i*dim->d3+j) += *(input_d+i*dim->d2+k) * (*(matrix_d+j*dim->d2+k));
-                // *(output_d+i*dim->d3+j)=66;
-
+__global__ void Dense_2D_2D(double *AD, double * BD, double * bias, Dimension * dim, double * outputD){
+    int tid_x = GetThreadX();//threadIdx.x + blockDim.x*blockIdx.x;
+    int tid_y = GetThreadY();//blockIdx.y*blockDim.y+ threadIdx.y;
+    while(tid_x < dim->d1){
+        while (tid_y < dim->d3){
+            double tmpValue = 0;
+            for (int i = 0; i< dim->d2;++i){
+                tmpValue += *(AD + tid_x *dim->d2 + i) * (*(BD + tid_y +i*dim->d3));
             }
+            *(outputD + tid_x*dim->d3 + tid_y) = relu(tmpValue+*(bias+tid_y));
+            tmpValue = 0;
+            tid_y += blockDim.y * gridDim.y;
         }
-    }
-
-}
-__global__ void Dense_1_8(float*input,float*params,float*bias,Dimension*dim,float*output)
-{
-
-    int x=GetThreadX();
-    int y=GetThreadY();
-    while(x<dim->d1)
-    {
-        while(y<dim->d3)
-        {
-            *(output+x*(dim->d3)+y)=*(input+x)*(*(params+y))+(*(bias+y));
-            y+=blockDim.y*gridDim.y;
-        }
-        y=GetThreadY();
-        x+=blockDim.x*gridDim.x;
+        tid_y = blockIdx.y*blockDim.y+ threadIdx.y;
+        tid_x += blockDim.x*gridDim.x;
     }
 }
-__global__ void Dense_4_1(float*input,float*params,float*bias,Dimension*dim,float*output)
-{
-    int x=GetThreadX();
-    int y=GetThreadY();
-    while(x<dim->d1)
-    {
-        while(y<dim->d2)
-        {
-            *(input+x*(dim->d2)+y)*=(*(params+y));
-            y+=blockDim.y*gridDim.y;
-        }
-        y=GetThreadY();
-        x+=blockDim.x*gridDim.x;
+__global__ void MAX(double * arrayD, double *outputD, int threadPerBlock, int dataSize){
+    __shared__ double cache[512];
+    int cacheIndex = threadIdx.x;
+    int tid = threadIdx.x+blockIdx.x*blockDim.x;
+    double tmpMax = 0;
+    while(tid < dataSize){
+        tmpMax = *(arrayD+tid);//max(*(arrayD+tid), tmpMax);
+        tid += blockDim.x * gridDim.x;
     }
-    x=GetThreadX();
-    y=GetThreadY();
-    int i=(blockIdx.x+blockIdx.y*gridDim.x)*(blockDim.x*blockDim.y)+threadIdx.y*blockDim.x+threadIdx.x;
-    while(i<dim->d1)
-    {
-        for(int j=0;j<dim->d2;j++)
-            *(output+i)+=*(input+i*dim->d2+j);
-        i+=gridDim.x*gridDim.y*blockDim.x*blockDim.y;
-    }
-    // int i=dim->d2/2;
-    // while(x<dim->d1)
-    // {
-    //     while(i!=0)
-    //     {
-    //         while(y<i)
-    //         {
-
-    //             *(input+x*(dim->d2)+y)+=*(input+x*(dim->d2)+y+i);
-    //             y+=blockDim.y*gridDim.y;
-    //             __syncthreads();
-    //         }
-    //         i/=2;
-    //     }
-    //     y=GetThreadY();
-    //     *(output+x)=*(input+x*(dim->d2))+(*(bias+y));
-    //     x+=blockDim.x*gridDim.x;
-    // }
-}
-__global__ void max_2D_1D (int dataSize, float * inputD, float * outputD){
-    int blockId = gridDim.x * blockIdx.y+ blockIdx.x;
-    int totalThreads = gridDim.x*gridDim.y * blockDim.x;
-    int threadId = blockId * blockDim.x+ threadIdx.x;
-    int threadCover = dataSize/(totalThreads);
+    cache[cacheIndex] = tmpMax;
     
-    int startPoint = threadId*threadCover;
-    int endPoint = (threadId+1)*threadCover;
-    
-
-    float tmpMax = 0;
-    for (int i = startPoint; i < endPoint; ++i ){
-        if (inputD[i] < tmpMax){
-            continue;
-        }else{
-            tmpMax = inputD[i];
+    __syncthreads();
+    int i = blockDim.x/2;
+    while(i !=0){
+        if(cacheIndex < i){
+            tmpMax = max( *(cache+cacheIndex),  *(cache+cacheIndex+i));
+            cache[cacheIndex] = tmpMax;
         }
+        __syncthreads();
+            i/=2;
     }
-    *(outputD+threadId) = tmpMax;
-}
-float max_1D(float * input, int dataSize){
-    // int max = 0;
-    
-
-    int gridDim_x = 2;
-    int gridDim_y = 2;
-    int blockDim_x = 2;
-    int totalThreads = gridDim_x*gridDim_y*blockDim_x;
-
-
-    dim3 gridSizeTmp(gridDim_x,gridDim_y);
-    dim3 blockSizeTmp(blockDim_x);
-
-
-    float *maxOutput_d, *maxOutput;
-    cudaMalloc((void**)&maxOutput_d,sizeof(float)*totalThreads);
-    maxOutput = (float*)malloc(sizeof(float)*totalThreads);
-
-    // DebugOutput * debugOutput, *debugOutput_d;
-    // debugOutput = (DebugOutput *)malloc(sizeof(DebugOutput)*totalThreads);
-    // cudaMalloc((void**)&debugOutput_d,sizeof(DebugOutput)*totalThreads);
-    
-    max_2D_1D<<<gridSizeTmp, blockSizeTmp>>>(dataSize, input, maxOutput_d);
-    cudaMemcpy(maxOutput, maxOutput_d,sizeof(float)*totalThreads,cudaMemcpyDeviceToHost);
-    float tmpMax = 0;
-    for (int i = 0; i< totalThreads; ++i){
-        // cout<<"thread_i_max:"<<*(maxOutput+i)<<endl;
-        if (*(maxOutput+i) <= tmpMax){
-            continue;
-        }else{
-
-            tmpMax = *(maxOutput+i);
-        }
+    if(cacheIndex == 0){
+        *(outputD+blockIdx.x) = tmpMax;
     }
 
+}
+double MAX_1D(double *inputD, int dataSize){
+    int threadPerBlock = 512;
+    int blocksPerGrid  = (dataSize+threadPerBlock)/threadPerBlock;
+    cout<<"blockPerGrid:"<<blocksPerGrid<<endl;
+    double *input;
+    input = (double*)malloc(sizeof(double)*dataSize);
 
-    cout<<"max:"<<tmpMax<<endl;
-    return tmpMax;
+    cudaMemcpy(input, inputD, sizeof(double)*dataSize, cudaMemcpyDeviceToHost);
 
+    double *maxOutput_d, *maxOutput;
+    cudaMalloc((void**)&maxOutput_d,sizeof(double)*blocksPerGrid);
+    maxOutput = (double*)malloc(sizeof(double)*blocksPerGrid);
+
+    MAX<<<blocksPerGrid, threadPerBlock>>>(inputD, maxOutput_d, threadPerBlock, dataSize);
+
+    cudaMemcpy(maxOutput, maxOutput_d, sizeof(double)*blocksPerGrid, cudaMemcpyDeviceToHost);
+ //   cout<<"MAX:"<<*(maxOutput)<<endl;
+    int maxValue = 0;
+    for (int i = 0 ; i < blocksPerGrid; ++i){
+        maxValue = max(*(maxOutput+i),maxValue);
+    }
+   // cout<<"MAX in MAX_1D:"<<maxValue<<endl;
+    return maxValue;
 }
 
-float model(KeysLogits*keysLogits,int dataSize,float*rawData){
+double model(KeysLogits*keysLogits,int dataSize,double*rawData){
+    cout<<setprecision(6);
     int paramsSize=8;
-    float*input=rawData;
-    float*params=(float*)malloc(sizeof(float)*paramsSize);
-    float*bias=(float*)malloc(sizeof(float)*paramsSize);
-    float*output=(float*)malloc(sizeof(float)*dataSize*paramsSize);
+
     Dimension *dim=(Dimension*)malloc(sizeof(Dimension));
     dim->d1=dataSize;
     dim->d2=1;
-    dim->d3=paramsSize;                                                                                                                                                                                                         ;
-    for(int i=0;i<paramsSize;i++)
-    {
-        *(params+i)=2;
-        *(bias+i)=0.1;
-    }
-    cout<<"***********************input***********************"<<endl;
-    for(int i=0;i<dataSize;i++)
-    {
-        cout<<*(input+i)<<' ';
-        
-    }
-    cout<<endl;
-    cout<<"***********************params***********************"<<endl;
-    for(int i=0;i<paramsSize;i++)
-    {
-        cout<<*(params+i)<<' ';
-    }
-    cout<<endl;
-    cout<<"***********************bias***********************"<<endl;
-    for(int i=0;i<paramsSize;i++)
-    {
-        cout<<*(bias+i)<<' ';
-    }
-    cout<<endl;
-    float *inputD,*paramsD,*biasD,*outputD;
+    dim->d3=paramsSize;
+    cout<<"dataSize:"<<dim->d1<<endl;;                               
+
+    double * weights_1_8, *weights_8_4, *weights_4_1, *bias_1_8, *bias_8_4, *bias_4_1;
+    double*input=rawData;
+    double*output=(double*)malloc(sizeof(double)*dataSize*paramsSize);
+	weights_1_8 = (double*)malloc(sizeof(double)*1*8);
+	weights_8_4 = (double*)malloc(sizeof(double)*8*4);
+	weights_4_1 = (double*)malloc(sizeof(double)*4*1);
+	bias_1_8 = (double*)malloc(sizeof(double)*8);
+	bias_8_4 = (double*)malloc(sizeof(double)*4);
+    bias_4_1 = (double*)malloc(sizeof(double)*1);
+
+
+    cout<<setprecision(8); 
+    initializeWeightsAndBias(weights_1_8, bias_1_8, weights_8_4, bias_8_4, weights_4_1, bias_4_1);
+    double *inputD,*paramsD,*biasD,*outputD;
     Dimension*dimD;
-    cudaMalloc((void **)&inputD, sizeof(float) * dataSize);
-    cudaMalloc((void **)&paramsD, sizeof(float) * paramsSize);
-    cudaMalloc((void **)&biasD, sizeof(float) * paramsSize);
-    cudaMalloc((void **)&outputD, sizeof(float) * dataSize*paramsSize);
+    cudaMalloc((void **)&inputD, sizeof(double) * dataSize);
+    cudaMalloc((void **)&paramsD, sizeof(double) * paramsSize);
+    cudaMalloc((void **)&biasD, sizeof(double) * paramsSize);
+    cudaMalloc((void **)&outputD, sizeof(double) * dataSize*paramsSize);
     cudaMalloc((void**)&dimD,sizeof(Dimension));
 
-    cudaMemcpy( inputD, input, sizeof(float) * dataSize, cudaMemcpyHostToDevice);
-    cudaMemcpy( paramsD, params, sizeof(float) * paramsSize, cudaMemcpyHostToDevice);
-    cudaMemcpy( biasD, bias, sizeof(float) * paramsSize, cudaMemcpyHostToDevice);
+    cudaMemcpy( inputD, input, sizeof(double) * dataSize, cudaMemcpyHostToDevice);
+    cudaMemcpy( paramsD, weights_1_8, sizeof(double) * paramsSize, cudaMemcpyHostToDevice);
+    cudaMemcpy( biasD, bias_1_8, sizeof(double) * paramsSize, cudaMemcpyHostToDevice);
     cudaMemcpy(dimD,dim,sizeof(Dimension),cudaMemcpyHostToDevice);
-    dim3 grid(4,2);
-    dim3 block(2,2);
-    Dense_1_8<<<1,block>>>(inputD,paramsD,biasD,dimD,outputD);
+    dim3 grid(16384,8);
+    dim3 block(1024,1);
 
-    cudaMemcpy( output, outputD, sizeof(float) * dataSize*paramsSize, cudaMemcpyDeviceToHost);
-
-    cout<<"***********************result***********************"<<endl;
-    for(int i=0;i<dataSize*paramsSize;i++)
-    {
-        cout<<*(output+i)<<"      ";
-        if((i+1)%paramsSize==0)
-            cout<<endl;
-    }
-
-
-
+    steady_clock::time_point Start = steady_clock::now();
+    Dense_2D_2D<<<grid,block>>>(inputD,paramsD,biasD,dimD,outputD);
+    
     Dimension *dim2=(Dimension*)malloc(sizeof(Dimension));
     dim2->d1=dataSize;
     dim2->d2=8;
     dim2->d3=4;
 
-    float*params2=(float*)malloc(sizeof(float)*dim2->d2*dim2->d3);
-
-    initializeMatrix(params2);
-    float*params2D;
+    double*params2D;
+    double*bias2D;
     Dimension *dimD2;
-
     cudaMalloc((void **)&dimD2, sizeof(Dimension));
-    cudaMalloc((void **)&params2D, sizeof(float) * dim2->d2*dim2->d3);
+    cudaMalloc((void **)&params2D, sizeof(double) * dim2->d2*dim2->d3);
+    cudaMalloc((void **)&bias2D, sizeof(double) * dim2->d3);
     cudaMemcpy(dimD2,dim2,sizeof(Dimension),cudaMemcpyHostToDevice);
-    cudaMemcpy(params2D,params2,sizeof(float)*dim2->d2*dim2->d3,cudaMemcpyHostToDevice);
-    float*output2=(float*)malloc(sizeof(float)*dim2->d1*dim2->d3);
-    float*output2D;
-    cudaMalloc((void **)&output2D, sizeof(float) * dim2->d1*dim2->d3);
-    cout<<"***********************param2***********************"<<endl;
-    for(int i=0;i<dim2->d2*dim2->d3;i++)
-    {
-        cout<<*(params2+i)<<"      ";
-        if((i+1)%dim2->d3==0)
-            cout<<endl;
-    }
-    dim3 grid2(2,2);
-    dim3 block2(2);
-    Dense2D2D<<<grid2,block2 >>>(outputD,params2D,dimD2,output2D);
-    cudaMemcpy( output2, output2D, sizeof(float) * dim2->d1*dim2->d3, cudaMemcpyDeviceToHost);
-    cout<<"***********************result2***********************"<<endl;
-    for(int i=0;i<dim2->d1*dim2->d3;i++)
-    {
-        cout<<*(output2+i)<<"      ";
-        if((i+1)%dim2->d3==0)
-            cout<<endl;
-    }
-    
-    // Dimension *dim33=(Dimension*)malloc(sizeof(Dimension));
-    // Dimension *dim33D;
+    cudaMemcpy(params2D,weights_8_4,sizeof(double)*dim2->d2*dim2->d3,cudaMemcpyHostToDevice);
+    cudaMemcpy(bias2D,bias_8_4,sizeof(double)*dim2->d3,cudaMemcpyHostToDevice);
+    double*output2=(double*)malloc(sizeof(double)*dim2->d1*dim2->d3);
+    double*output2D;
+    cudaMalloc((void **)&output2D, sizeof(double) * dim2->d1*dim2->d3);
+
+    Dense_2D_2D<<<grid,block >>>(outputD,params2D,bias2D,dimD2,output2D);
     dim->d1=dataSize;
     dim->d2=4;
     dim->d3=1;
-    // Dimension *dimD2;
-    float *final=(float*)malloc(sizeof(float)*dim->d1*dim->d3);
+    Dimension *dimD3;
+    double *final=(double*)malloc(sizeof(double)*dim->d1*dim->d3);
 
-    float *finalD;
-    cudaMalloc((void **)&finalD, sizeof(float) * dim->d1*dim->d3);
-    // cudaMalloc((void **)&dimD2, sizeof(Dimension));
-    cudaMemcpy(dimD2,dim,sizeof(Dimension),cudaMemcpyHostToDevice);
+    double *finalD;
+    double*params3D;
+    double*bias3D;
+    cudaMalloc((void **)&finalD, sizeof(double) * dim->d1*dim->d3);
+    cudaMalloc((void **)&params3D, sizeof(double) * dim->d2);
+    cudaMalloc((void **)&bias3D, sizeof(double) * dim->d3);
+    cudaMalloc((void **)&dimD3, sizeof(Dimension));
 
-    Dense_4_1<<<1,block>>>(output2D,paramsD,biasD,dimD2,finalD);
-    cudaMemcpy( final, finalD, sizeof(float) * dim->d1*dim->d3, cudaMemcpyDeviceToHost);
+    cudaMemcpy( params3D, weights_4_1, sizeof(double) * dim->d2, cudaMemcpyHostToDevice);
+    cudaMemcpy(dimD3,dim,sizeof(Dimension),cudaMemcpyHostToDevice);
+    cudaMemcpy(bias3D,bias_4_1,sizeof(double)*dim->d3,cudaMemcpyHostToDevice);
+
+    Dense_2D_2D<<<grid,block>>>(output2D,params3D,bias3D,dimD3,finalD);
+    cudaMemcpy(final,finalD,sizeof(double)*dim->d1*dim->d3,cudaMemcpyDeviceToHost);
+    steady_clock::time_point nonMax = steady_clock::now();
+    double max=MAX_1D(finalD, dim->d1);
+    
+    steady_clock::time_point end = steady_clock::now();
+    duration<double, std::milli> *timePredicte = new duration<double, std::milli>(end -Start);
+    duration<double, std::milli> *timeNonMax = new duration<double, std::milli>(nonMax -Start);
+    cout <<endl<< "consumming of predict:" << timePredicte->count() << " ms" << endl;
+    cout <<endl<< "consumming of nonMax:" << timeNonMax->count() << " ms" << endl;
+
     keysLogits->logits=final;
-    cout<<endl;
-    cout<<"***********************result3***********************"<<endl;
-    for(int i=0;i<dataSize;i++)
-    {
-        cout<<*(final+i)<<"      ";
-    }
-    float max=max_1D(finalD, dim->d1);
     // free(input);
-    free(params);
-    free(bias);
     free(output);
     free(dim);
-    free(params2);
     free(dim2);
     free(output2);
     // free(final);
@@ -323,7 +210,6 @@ float model(KeysLogits*keysLogits,int dataSize,float*rawData){
     cudaFree(finalD);
 
 
-    cout<<"hello world\n";
     return max;
 }
 

@@ -9,13 +9,13 @@
 #define UPLIMIT 128;
 
 
-__device__ float Relu(float);
+__device__ double Relu(double);
 void CudaProp();
 struct Params{
     int n;//datasize
-    float * dense_1_8;
-    float * dense_8_4;
-    float * dense_4_1;
+    double * dense_1_8;
+    double * dense_8_4;
+    double * dense_4_1;
 };
 struct Dimension{
     int d1;
@@ -24,10 +24,13 @@ struct Dimension{
 };
 __device__ int GetThreadX();
 __device__ int GetThreadY();
-__global__ void Dense2D2D( float * , float *,Dimension*,float* );
-__global__ void Dense_1_8(float*,float*,float*,Dimension*,float*);
-__global__ void Dense_4_1(float*,float*,float*,Dimension*,float*);
-__global__ void max_2D_1D (int , float * , float * );
-float max_1D(float * , int );
-float model(KeysLogits*,int,float*);
+__global__ void Dense_1_8(double*,double*,double*,Dimension*,double*);
+__global__ void dense_8_4(double *, double *, double *, Dimension *, double *);
+__global__ void Dense_2D_2D(double *, double *, double *, Dimension *, double *);
+__global__ void Dense_4_1(double*,double*,double*,Dimension*,double*);
+__global__ void max_2D_1D (int , double * , double * );
+__global__ void MAX(double * , double *, int, int );
+double max_1D(double * , int );
+double MAX_1D(double *inputD, int dataSize);
+double model(KeysLogits*,int,double*);
 #endif

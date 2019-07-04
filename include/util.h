@@ -3,9 +3,12 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include<locale>
 #include<algorithm>
 #include<chrono>
-#include<float.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <iomanip>
 using std::cout;
 using std::default_random_engine;
 using std::uniform_real_distribution;
@@ -15,16 +18,17 @@ using std::sort;
 using std::chrono::steady_clock;
 using std::chrono::duration;
 
-vector<float> *InitializeVec(int, int);
-float *Initialize(int, int);
+vector<double> *InitializeVec(int, int);
+double *Initialize(int, int);
 void check(vector<double> *);
 struct KeysLogits{
     int sizeKeys;
     int sizeLogits;
-    float *keys;
-    float * logits;
+    double *keys;
+    double * logits;
 };
 int max_(KeysLogits * );
-void initializeMatrix(float * );
+void initializeMatrix(double * );
+void initializeWeightsAndBias(double * , double * , double * , double * , double * , double *);
 void hello();
 #endif

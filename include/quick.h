@@ -8,7 +8,8 @@ using std::endl;
 using std::vector;
 
 
-void QuickSort(vector<double> *, int, int);
+//void QuickSort(vector<double> *, int, int);
+void QuickSort(double *, int, int);
 int Partion(vector<double> *, int, int);
 
 

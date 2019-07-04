@@ -2,8 +2,11 @@
 #define MAP_H
 #include<vector>
 #include<cmath>
-#include<float.h>
+#include<locale>
 #include"util.h"
+#include<float.h>
+#include<iostream>
+#include<string.h>
 struct InitResut
 {
     /* data */
@@ -14,14 +17,15 @@ struct InitResultGpu
 {
     int sizeSorted;
     int sizeWaited;
-    float*sortedList;
-    float*waitedList;
+    double*sortedList;
+    double*waitedList;
 };
 
 //初步排序
 void ToBucket(KeysLogits*,InitResultGpu*);
+void Certify(double *, int);
 //合并
-void Merge(InitResut*,vector<double>*);
-void Merge(InitResultGpu*, float *);
+//void Merge(InitResut*,vector<double>*);
+void Merge(InitResultGpu*, double *);
 
 #endif
