@@ -124,6 +124,20 @@ double model(KeysLogits*keysLogits,int dataSize,double*rawData){
 
     cout<<setprecision(8); 
     initializeWeightsAndBias(weights_1_8, bias_1_8, weights_8_4, bias_8_4, weights_4_1, bias_4_1);
+    /*
+    cout<<"----------------------------weight_1_8--------------------------"<<endl;
+    for (int i = 0; i < 8; ++i){
+        for (int j = 0 ;j<4; ++j){
+            cout<<*(weights_1_8 + i*4 + j);
+        }
+        cout<<endl;
+    }
+    cout<<"----------------------------bias_1_8--------------------------"<<endl;
+    for (int i = 0; i < 8; ++i){
+        cout<<*(bias_1_8 + i);
+    }
+    */
+
     double *inputD,*paramsD,*biasD,*outputD;
     Dimension*dimD;
     cudaMalloc((void **)&inputD, sizeof(double) * dataSize);
@@ -136,12 +150,25 @@ double model(KeysLogits*keysLogits,int dataSize,double*rawData){
     cudaMemcpy( paramsD, weights_1_8, sizeof(double) * paramsSize, cudaMemcpyHostToDevice);
     cudaMemcpy( biasD, bias_1_8, sizeof(double) * paramsSize, cudaMemcpyHostToDevice);
     cudaMemcpy(dimD,dim,sizeof(Dimension),cudaMemcpyHostToDevice);
-    dim3 grid(16384,8);
+    dim3 grid(8192,4);
     dim3 block(1024,1);
 
     steady_clock::time_point Start = steady_clock::now();
     Dense_2D_2D<<<grid,block>>>(inputD,paramsD,biasD,dimD,outputD);
-    
+
+    //start debug
+    /*
+    double * output1;
+    output1 = (double *)malloc(sizeof(double)*dataSize*8);
+    cudaMemcpy(output1, outputD, sizeof(double)*dataSize*8, cudaMemcpyDeviceToHost);
+    for (int i =0; i < 16; ++i){
+        for (int j =0; j < 8; ++j ){
+            cout<<*(output1+i*8+j)<<"   ";
+        }
+        cout<<endl;
+    }
+    */
+    //end debug
     Dimension *dim2=(Dimension*)malloc(sizeof(Dimension));
     dim2->d1=dataSize;
     dim2->d2=8;
@@ -156,11 +183,26 @@ double model(KeysLogits*keysLogits,int dataSize,double*rawData){
     cudaMemcpy(dimD2,dim2,sizeof(Dimension),cudaMemcpyHostToDevice);
     cudaMemcpy(params2D,weights_8_4,sizeof(double)*dim2->d2*dim2->d3,cudaMemcpyHostToDevice);
     cudaMemcpy(bias2D,bias_8_4,sizeof(double)*dim2->d3,cudaMemcpyHostToDevice);
-    double*output2=(double*)malloc(sizeof(double)*dim2->d1*dim2->d3);
+
     double*output2D;
     cudaMalloc((void **)&output2D, sizeof(double) * dim2->d1*dim2->d3);
 
     Dense_2D_2D<<<grid,block >>>(outputD,params2D,bias2D,dimD2,output2D);
+
+    //start debug
+    /*
+    double*output2=(double*)malloc(sizeof(double)*dim2->d1*dim2->d3);
+    cudaMemcpy(output2, output2D, sizeof(double) * dim2->d1 * dim2->d3, cudaMemcpyDeviceToHost);
+    for (int i =0; i < 16; ++i){
+        for (int j =0; j < 4; ++j ){
+            cout<<*(output2+i*4+j)<<"   ";
+        }
+        cout<<endl;
+    }
+
+    */
+    //end debug
+
     dim->d1=dataSize;
     dim->d2=4;
     dim->d3=1;
@@ -181,9 +223,16 @@ double model(KeysLogits*keysLogits,int dataSize,double*rawData){
 
     Dense_2D_2D<<<grid,block>>>(output2D,params3D,bias3D,dimD3,finalD);
     cudaMemcpy(final,finalD,sizeof(double)*dim->d1*dim->d3,cudaMemcpyDeviceToHost);
+    //start debug 
+    /*
+    for (int i =0; i < dataSize; ++i){
+            cout<<*(final+i)<<endl;
+    }*/
+    //end debug
+
     steady_clock::time_point nonMax = steady_clock::now();
     double max=MAX_1D(finalD, dim->d1);
-    
+    //cout<<"max:"<<max<<endl;
     steady_clock::time_point end = steady_clock::now();
     duration<double, std::milli> *timePredicte = new duration<double, std::milli>(end -Start);
     duration<double, std::milli> *timeNonMax = new duration<double, std::milli>(nonMax -Start);
@@ -191,12 +240,13 @@ double model(KeysLogits*keysLogits,int dataSize,double*rawData){
     cout <<endl<< "consumming of nonMax:" << timeNonMax->count() << " ms" << endl;
 
     keysLogits->logits=final;
+
     free(input);
     free(output);
     free(dim);
     free(dim2);
-    free(output2);
-    free(final);
+   // free(output2);
+ //   free(final);
     cudaFree(inputD);
     cudaFree(paramsD);
     cudaFree(biasD);
@@ -206,7 +256,6 @@ double model(KeysLogits*keysLogits,int dataSize,double*rawData){
     cudaFree(params2D);
     cudaFree(output2D);
     cudaFree(finalD);
-
 
     return max;
 }

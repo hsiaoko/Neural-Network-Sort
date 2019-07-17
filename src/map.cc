@@ -75,5 +75,4 @@ void Certify(double * array, int dataSize){
         }
     }
     cout<<"sorted"<<endl;
-
 }

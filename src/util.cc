@@ -67,43 +67,40 @@ void initializeWeightsAndBias(double * weights_1_8, double * bias_1_8, double * 
 	//buffer = (double*)malloc(sizeof(double)*matrixX*matrixy);
 
 
-	if((pFile = fopen ("/home/special/user/local/zxk/nns/Neural-Network-Sort-debug/params/1-1M_uniform_67128864_weight/weights_1_8.b","r")) == NULL){
+	if((pFile = fopen ("params/1-1M_uniform_67128864_weight/weights_1_8.b","r")) == NULL){
 		cout<<"can't open weights_1_8.txt"<<endl;
 	}else{
 		fread(weights_1_8, sizeof(double),1*8, pFile);
 		fclose(pFile);
 	}
-	if((pFile = fopen ("/home/special/user/local/zxk/nns/Neural-Network-Sort-debug/params/1-1M_uniform_67128864_weight/weights_8_4.b","r")) == NULL){
+	if((pFile = fopen ("params/1-1M_uniform_67128864_weight/weights_8_4.b","r")) == NULL){
 		cout<<"can't open weights_8_4.txt"<<endl;
 	}else{
 		fread(weights_8_4, sizeof(double),8*4, pFile);
 		fclose(pFile);
 	}
-	if((pFile = fopen ("/home/special/user/local/zxk/nns/Neural-Network-Sort-debug/params/1-1M_uniform_67128864_weight/weights_4_1.b","r")) == NULL){
+	if((pFile = fopen ("params/1-1M_uniform_67128864_weight/weights_4_1.b","r")) == NULL){
 		cout<<"can't open weight_4_1.txt"<<endl;
 	}else{
 		fread(weights_4_1, sizeof(double),4*1, pFile);
 		fclose(pFile);
 	}
-	if((pFile = fopen ("/home/special/user/local/zxk/nns/Neural-Network-Sort-debug/params/1-1M_uniform_67128864_weight/bias_1_8.b","r")) == NULL){
+	if((pFile = fopen ("params/1-1M_uniform_67128864_weight/bias_1_8.b","r")) == NULL){
 		cout<<"can't open bias_1_8.txt"<<endl;
 	}else{
 		fread(bias_1_8, sizeof(double),1*8, pFile);
 		fclose(pFile);
 	}
-	if((pFile = fopen ("/home/special/user/local/zxk/nns/Neural-Network-Sort-debug/params/1-1M_uniform_67128864_weight/bias_8_4.b","r")) == NULL){
+	if((pFile = fopen ("params/1-1M_uniform_67128864_weight/bias_8_4.b","r")) == NULL){
 		cout<<"can't open bias_8_4.txt"<<endl;
 	}else{
 		fread(bias_8_4, sizeof(double), 8*4, pFile);
 		fclose(pFile);
 	}
-	if((pFile = fopen ("/home/special/user/local/zxk/nns/Neural-Network-Sort-debug/params/1-1M_uniform_67128864_weight/bias_4_1.b","r")) == NULL){
+	if((pFile = fopen ("params/1-1M_uniform_67128864_weight/bias_4_1.b","r")) == NULL){
 		cout<<"can't open bias_4_1.txt"<<endl;
 	}else{
 		fread(bias_4_1, sizeof(double),4*1, pFile);
 		fclose(pFile);
 	}
-}
-void hello(){
-    cout<<"hello world"<<endl;
 }

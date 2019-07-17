@@ -7,7 +7,8 @@ using namespace std;
 
 int main()
 {
-   int dataSize = 31457280;
+    //31457280;
+   int dataSize = 12000000;
    double *rawData = Initialize(dataSize, 4);
 
     steady_clock::time_point time1 = steady_clock::now();
@@ -18,7 +19,6 @@ int main()
 
     double max = model(keysLogits, dataSize, rawData);
 
-
     InitResultGpu *initResultGpu = (InitResultGpu *)malloc(sizeof(initResultGpu));
     initResultGpu->sizeSorted = int(round(max)) + 1;
     initResultGpu->sizeWaited = 0;
@@ -26,7 +26,7 @@ int main()
     memset(initResultGpu->sortedList, 0, sizeof(double)*initResultGpu->sizeSorted);
 
     steady_clock::time_point time2 = steady_clock::now();
-
+    
     ToBucket(keysLogits, initResultGpu);
 
     double max_ = 0;
@@ -58,8 +58,8 @@ int main()
     Certify(sortResult, keysLogits->sizeKeys);
     free(initResultGpu->sortedList);
     free(initResultGpu);
-    free(keysLogits->keys);
-    free(keysLogits->logits);
+    //free(keysLogits->keys);
+    //free(keysLogits->logits);
     free(keysLogits);
     free(sortResult);
 }
